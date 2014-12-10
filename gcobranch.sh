@@ -68,6 +68,6 @@ else
     finalcol=${CERROR}
 fi
 
-echo -e "\n${finalcol}Done with ${ERRCOUNT} errors"
+echo -e "\n${finalcol}Done with ${ERRCOUNT} errors${CNORMAL}"
 
 
