@@ -3,7 +3,7 @@
 # Syntax: $ gcobranch.sh {branch} {dir1} [{dir2} {dir3}...]
 
 CNORMAL='\e[00m'
-CHIGHLIGHT="\e[01;34m"
+CHIGHLIGHT="\e[01;36m"
 CERROR='\033[31m'
 CSUCCESS='\e[32m'
 ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|';
