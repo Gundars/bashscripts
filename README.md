@@ -15,7 +15,9 @@ Syntax: `$ gcobranch {branch} {dir1} [{dir2} {dir3}...]`
 ###gitmerge
 Merges current branch with {branch}, pushes changes to origin
 If no {branch} is specified, "development" is used
+
 Syntax: `$ gitmerge [options] [branch]`
+
 Options:
 - `-p`  generate links to test/master pull requests
 
