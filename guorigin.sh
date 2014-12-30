@@ -7,8 +7,7 @@ NORMAL='\e[00m'
 ERROR='\033[31m'
 GREEN='\e[32m'
 
-#DIR="/home/vagrant/sites/dplay.dev/docs/wp-content/plugins/wp-plugin-fusion-platform-core";
-DIR="/home/vagrant/sites/dplay.dev/docs/wp-content/plugins/";
+DIR="/fill/this/in/..........";
 cd $DIR>/dev/null; echo -e "${HIGHLIGHT}Scanning ${PWD}${NORMAL}"; cd ->/dev/null
 
 for d in `find $DIR -name .git -type d`; do
