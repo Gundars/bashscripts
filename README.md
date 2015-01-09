@@ -5,7 +5,7 @@ Collection of bash scripts
 ###Installation
 Execute following line in bash shell:
 ```
-$ git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo ln -s ~/.bashscripts/gcobranch.sh /usr/local/bin/gcobranch && sudo chmod 0744 /usr/local/bin/gcobranch && sudo ln -s ~/.bashscripts/gitmerge.sh /usr/local/bin/gitmerge && sudo chmod 0744 /usr/local/bin/gitmerge
+$ git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo ln -s ~/.bashscripts/gcobranch.sh /usr/local/bin/gcobranch && sudo chmod 0744 /usr/local/bin/gcobranch && sudo ln -s ~/.bashscripts/gitmerge.sh /usr/local/bin/gitmerge && sudo chmod 0744 /usr/local/bin/gitmerge && sudo ln -s ~/.bashscripts/guorigin.sh /usr/local/bin/guorigin && sudo chmod 0744 /usr/local/bin/guorigin
 ```
 
 ###gcobranch
@@ -24,4 +24,4 @@ Options:
 ###guorigin
 Update git origins from o-auth and SSH to native https in all git repos found in each of specified directories {dir}
 
-Syntax: `$ guorigin {branch} {dir1} [{dir2} {dir3}...]`
+Syntax: `$ guorigin {dir1} [{dir2} {dir3}...]`
