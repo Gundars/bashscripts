@@ -3,9 +3,9 @@ Bash Scripts
 Collection of bash scripts
 
 ###Installation
-Execute following line in bash shell:
+Execute following line in bash shell as a user:
 ```
-$ git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo ln -s ~/.bashscripts/gcobranch.sh /usr/local/bin/gcobranch && sudo chmod 0744 /usr/local/bin/gcobranch && sudo ln -s ~/.bashscripts/gitmerge.sh /usr/local/bin/gitmerge && sudo chmod 0744 /usr/local/bin/gitmerge && sudo ln -s ~/.bashscripts/guorigin.sh /usr/local/bin/guorigin && sudo chmod 0744 /usr/local/bin/guorigin
+git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo ln -s ~/.bashscripts/gcobranch.sh /usr/local/bin/gcobranch && sudo chmod 0744 /usr/local/bin/gcobranch && sudo ln -s ~/.bashscripts/gitmerge.sh /usr/local/bin/gitmerge && sudo chmod 0744 /usr/local/bin/gitmerge && sudo ln -s ~/.bashscripts/guorigin.sh /usr/local/bin/guorigin && sudo chmod 0744 /usr/local/bin/guorigin
 ```
 
 ###gcobranch
