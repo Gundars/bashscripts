@@ -51,13 +51,13 @@ if [ "$OPTP" = true ] ; then
       cleanedOrigin=(`echo $currentOrigin | tr '@' "\n"`)
       newOrigin="https://${cleanedOrigin[1]}"
       if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
-         currentOrigin=newOrigin
+         currentOrigin=$newOrigin
       fi
     elif [[ "${currentOrigin}" =~ "git@github.com:" ]]; then
       cleanedOrigin=(`echo $currentOrigin | tr ':' "\n"`)
       newOrigin="https://github.com/${cleanedOrigin[1]}"
       if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
-         currentOrigin=newOrigin
+         currentOrigin=$newOrigin
       fi
     fi
     for prBranch in ${PRBRANCHES[@]}; do
