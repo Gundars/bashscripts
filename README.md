@@ -13,15 +13,13 @@ Checks out and pulls specified git {branch} in all git repos found in each of sp
 Syntax: `$ gcobranch {branch} {dir1} [{dir2} {dir3}...]`
 
 ###gitmerge
-Merges current branch with {branch}, pushes changes to origin
-If no {branch} is specified, "development" is used
-
+Merges current branch with {branch}, pushes changes to origin. If no {branch} is specified, "development" is used
 Syntax: `$ gitmerge [options] [branch]`
 
 Options:
 - `-p`  generate links to test/master pull requests
 
 ###guorigin
-Update composer origins to github origins in all repos
-Under development!
+Update git origins from o-auth and SSH to native https in all git repos found in each of specified directories {dir}
+Syntax: `$ guorigin {branch} {dir1} [{dir2} {dir3}...]`
 

@@ -53,6 +53,12 @@ if [ "$OPTP" = true ] ; then
       if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
          currentOrigin=newOrigin
       fi
+    elif [[ "${currentOrigin}" =~ "git@github.com:" ]]; then
+      cleanedOrigin=(`echo $currentOrigin | tr ':' "\n"`)
+      newOrigin="https://github.com/${cleanedOrigin[1]}"
+      if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
+         currentOrigin=newOrigin
+      fi
     fi
     for prBranch in ${PRBRANCHES[@]}; do
         echo -e "${CHIGHLIGHT}PR ${prBranch}:${CNORMAL} ${currentOrigin/%.git//compare/${prBranch}...${currentBranch}}"
