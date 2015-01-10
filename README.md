@@ -5,16 +5,20 @@ Collection of bash scripts
 ###Installation
 Execute following line in bash shell as a user:
 ```
-git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo ln -s ~/.bashscripts/gcobranch.sh /usr/local/bin/gcobranch && sudo chmod 0744 /usr/local/bin/gcobranch && sudo ln -s ~/.bashscripts/gitmerge.sh /usr/local/bin/gitmerge && sudo chmod 0744 /usr/local/bin/gitmerge && sudo ln -s ~/.bashscripts/guorigin.sh /usr/local/bin/guorigin && sudo chmod 0744 /usr/local/bin/guorigin
+git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && bash install.sh
+```
+To update existing scripts run
+```
+bash ~/.bashscripts/install.sh
 ```
 
 ###gcobranch
-Checks out and pulls specified git {branch} in all git repos found in each of specified directories {dir}
+Checks out and pulls specified git branch {branch} in all git repos found in each of specified directories {dir}
 
 Syntax: `$ gcobranch {branch} {dir1} [{dir2} {dir3}...]`
 
 ###gitmerge
-Merges current branch with {branch}, pushes changes to origin. If no {branch} is specified, "development" is used
+Merges current branch with branch {branch}, pushes changes to origin. If no {branch} is specified, "development" is used
 
 Syntax: `$ gitmerge [options] [branch]`
 
