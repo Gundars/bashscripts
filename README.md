@@ -5,7 +5,7 @@ Collection of bash scripts
 ###Installation
 Execute following line in bash shell as a user:
 ```
-git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && bash install.sh
+git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && bash ~/.bashscripts/install.sh
 ```
 To update existing scripts run
 ```
