@@ -3,7 +3,7 @@
 # Usage: git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo bash install.sh
 
 git pull origin master
-SCRIPTS=( gcobranch gitmerge guorigin )
+SCRIPTS=( gcobranch gitmerge guorigin buildenv )
 for SCRIPT in ${SCRIPTS[@]}
 do
 	if [ ! -f /usr/local/bin/${SCRIPT} ]; then

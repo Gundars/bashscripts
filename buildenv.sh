@@ -18,7 +18,7 @@ BNRREGEX="[0-9]{1,5}"
 TMPDIR=~/.bashscripts/tmp
 ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|';
 ERRCOUNT=0
-REPO="link/to/encriched.git"
+REPO="https/link/to/encriched.git"
 
 if [ $# -lt 3 ]; then
   	ERRCOUNT=$[ERRCOUNT + 1]
@@ -51,12 +51,16 @@ if ! [[ $BNR =~ $BNRREGEX ]]; then
 	echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
 fi
 
+if ! [[ $ERRCOUNT =~ 0 ]]; then
+	ERRCOUNT=$[ERRCOUNT + 1]
+	exit 1;
+fi
+
 rm -rf $TMPDIR
 git clone $REPO $TMPDIR
 FILE=$TMPDIR/environment_definition/${BRANCH}1/environment_definition.def
 sed -i "s/^${ENV}.*/${ENV} = ${BNR}/g" $FILE
 git add $FILE
-git diff $FILE
 git commit -m "${ENV} changed to ${BNR}"
 git push origin master
 rm -rf $TMPDIR

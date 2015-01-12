@@ -29,3 +29,8 @@ Options:
 Update git origins from o-auth and SSH to native https in all git repos found in each of specified directories {dir}
 
 Syntax: `$ guorigin {dir1} [{dir2} {dir3}...]`
+
+###buildenv
+Change build number {build number} for an branch {branch on a site environmnet {env} 
+
+Syntax: `$ buildenv {env} {branch} {build number}`
