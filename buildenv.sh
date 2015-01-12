@@ -34,25 +34,28 @@ if ! [[ $ENV =~ $ENVREGEX ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
 	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad environment${CNORMAL}\n"
 	echo "{env} syntax: www_domain_extension"
-	echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
 fi
 
 if ! [[ $BRANCH =~ $BRANCHREGEX ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
 	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad branch${CNORMAL}\n"
 	echo "{branch} syntax: dev | test | staging"
-	echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
 fi
 
 if ! [[ $BNR =~ $BNRREGEX ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
 	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad build number${CNORMAL}\n"
 	echo "{build number} syntax: integer 1-5 digits long"
-	echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
+fi
+
+if [[ $REPO =~ "https/link/to/encriched.git" ]]; then
+	ERRCOUNT=$[ERRCOUNT + 1]
+	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad repository name${CNORMAL}\n"
+	echo "Please change line 21 'https/link/to/encriched.git' to valid link to repository"
 fi
 
 if ! [[ $ERRCOUNT =~ 0 ]]; then
-	ERRCOUNT=$[ERRCOUNT + 1]
+        echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
 	exit 1;
 fi
 

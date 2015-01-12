@@ -31,6 +31,7 @@ Update git origins from o-auth and SSH to native https in all git repos found in
 Syntax: `$ guorigin {dir1} [{dir2} {dir3}...]`
 
 ###buildenv
-Change build number {build number} for an branch {branch on a site environmnet {env} 
+Changes build number {build number} for an branch {branch on a site environmnet {env}. 
+Before using script, change line 21 - assign REPO to valid link to github build repo. It rhymes with "confusion switched". Make sure you have accesss
 
 Syntax: `$ buildenv {env} {branch} {build number}`
