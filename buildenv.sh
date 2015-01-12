@@ -18,6 +18,7 @@ BNRREGEX="[0-9]{1,5}"
 TMPDIR=~/.bashscripts/tmp
 ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|';
 ERRCOUNT=0
+REPO="link/to/encriched.git"
 
 if [ $# -lt 3 ]; then
   	ERRCOUNT=$[ERRCOUNT + 1]
@@ -51,7 +52,7 @@ if ! [[ $BNR =~ $BNRREGEX ]]; then
 fi
 
 rm -rf $TMPDIR
-git clone https://github.com/DNI-New-Platform/fusion_enriched_site_definition.git $TMPDIR
+git clone $REPO $TMPDIR
 FILE=$TMPDIR/environment_definition/${BRANCH}1/environment_definition.def
 sed -i "s/^${ENV}.*/${ENV} = ${BNR}/g" $FILE
 git add $FILE
