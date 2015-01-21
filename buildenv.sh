@@ -51,7 +51,7 @@ fi
 if [[ $REPO =~ "https/link/to/encriched.git" ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
 	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad repository name${CNORMAL}\n"
-	echo "Please change line 21 'https/link/to/encriched.git' to valid link to repository"
+	echo "Please change line 21 'https/link/to/encriched.git' in file ~/.bashscripts/buildenv.sh to valid link to repository"
 fi
 
 if ! [[ $ERRCOUNT =~ 0 ]]; then
@@ -59,11 +59,19 @@ if ! [[ $ERRCOUNT =~ 0 ]]; then
 	exit 1;
 fi
 
-rm -rf $TMPDIR
-git clone $REPO $TMPDIR
-FILE=$TMPDIR/environment_definition/${BRANCH}1/environment_definition.def
+STARTDIR=${PWD}
+if ! [ -d "$TMPDIR" ]; then 
+    git clone $REPO $TMPDIR
+fi
+cd $TMPDIR
+git pull origin master
+FILE=environment_definition/${BRANCH}1/environment_definition.def
 sed -i "s/^${ENV}.*/${ENV} = ${BNR}/g" $FILE
 git add $FILE
-git commit -m "${ENV} changed to ${BNR}"
+git commit -m "${ENV} to ${BNR}"
+DIFFR=`git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/'`
+DIFFG=`git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[31m-(.*)\e\[m$/'`
 git push origin master
-rm -rf $TMPDIR
+cd $STARTDIR
+echo -e "\n${CERROR} ${DIFFR} ${CNORMAL}"
+echo -e "${CSUCCESS} ${DIFFG} ${CNORMAL}"
