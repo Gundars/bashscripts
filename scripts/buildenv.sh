@@ -4,11 +4,7 @@
 # {env} syntax: www_domain_extension
 # {branch} syntax: dev | test | staging
 # {build number} syntax: integer 1-5 digits long
-
-CNORMAL='\e[00m'
-CHIGHLIGHT="\e[01;36m"
-CERROR='\033[31m'
-CSUCCESS='\e[32m'
+source ~/.bashscripts/lib/commons.sh
 ENV=$1
 ENVREGEX="^w{3}_.*_[a-zA-Z]{2,4}$"
 BRANCH=$2
@@ -22,40 +18,40 @@ REPO="https/link/to/encriched.git"
 
 if [ $# -lt 3 ]; then
   	ERRCOUNT=$[ERRCOUNT + 1]
-    echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Incorrect arguments specified${CNORMAL}\n"
+    echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Incorrect arguments specified${gConf[colorNormal]}\n"
     echo "Usage: buildenv {env} {branch} {build number}"
     echo "{env} syntax: www_domain_extension"
     echo "{branch} syntax: dev | test | staging"
-    echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
+    echo -e "\n${gConf[colorError]}Exited with ${ERRCOUNT} errors${gConf[colorNormal]}"
     exit 0
 fi
 
 if ! [[ $ENV =~ $ENVREGEX ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
-	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad environment${CNORMAL}\n"
+	echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Bad environment${gConf[colorNormal]}\n"
 	echo "{env} syntax: www_domain_extension"
 fi
 
 if ! [[ $BRANCH =~ $BRANCHREGEX ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
-	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad branch${CNORMAL}\n"
+	echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Bad branch${gConf[colorNormal]}\n"
 	echo "{branch} syntax: dev | test | staging"
 fi
 
 if ! [[ $BNR =~ $BNRREGEX ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
-	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad build number${CNORMAL}\n"
+	echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Bad build number${gConf[colorNormal]}\n"
 	echo "{build number} syntax: integer 1-5 digits long"
 fi
 
 if [[ $REPO =~ "https/link/to/encriched.git" ]]; then
 	ERRCOUNT=$[ERRCOUNT + 1]
-	echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Bad repository name${CNORMAL}\n"
+	echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Bad repository name${gConf[colorNormal]}\n"
 	echo "Please change line 21 'https/link/to/encriched.git' in file ~/.bashscripts/buildenv.sh to valid link to repository"
 fi
 
 if ! [[ $ERRCOUNT =~ 0 ]]; then
-        echo -e "\n${CERROR}Exited with ${ERRCOUNT} errors${CNORMAL}"
+        echo -e "\n${gConf[colorError]}Exited with ${ERRCOUNT} errors${gConf[colorNormal]}"
 	exit 1;
 fi
 
@@ -73,5 +69,5 @@ DIFFG=`git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[32m\+\e\
 DIFFR=`git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[31m-(.*)\e\[m$/'`
 git push origin master
 cd $STARTDIR
-echo -e "\n${CERROR} ${DIFFR} ${CNORMAL}"
-echo -e "${CSUCCESS} ${DIFFG} ${CNORMAL}"
+echo -e "\n${gConf[colorError]} ${DIFFR} ${gConf[colorNormal]}"
+echo -e "${gConf[colorSuccess]} ${DIFFG} ${gConf[colorNormal]}"

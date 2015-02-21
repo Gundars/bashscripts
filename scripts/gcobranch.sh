@@ -1,17 +1,12 @@
 #!/bin/bash
 # Checks out and pulls specified {branch} in all git repos found in each of specified {dir}
 # Syntax: $ gcobranch.sh {branch} {dir1} [{dir2} {dir3}...]
-
-CNORMAL='\e[00m'
-CHIGHLIGHT="\e[01;36m"
-CERROR='\033[31m'
-CSUCCESS='\e[32m'
-ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|';
+source ~/.bashscripts/lib/commons.sh
 ERRCOUNT=0
 
 if [ $# -lt 2 ]
   then
-    echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Incorrect arguments specified${CNORMAL}"
+    echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Incorrect arguments specified${gConf[colorNormal]}"
     echo "Usage: gcobranch [branch] [dir] [dir]..."   
     exit 0
 fi
@@ -28,9 +23,9 @@ do
 
         for d in `find $dir -name .git -type d`; do
           cd $d/.. > /dev/null
-          echo -e "\n${CHIGHLIGHT}Repo: `pwd`$CNORMAL"
+          echo -e "\n${gConf[colorHighlight]}Repo: `pwd`$gConf[colorNormal]"
           CURRENT=`git rev-parse --abbrev-ref HEAD`;
-          echo -e "Current branch$CNORMAL: ${CURRENT}"
+          echo -e "Current branch$gConf[colorNormal]: ${CURRENT}"
           TXTCHECKOUT="No need to checkout"
 
           if [[ "${CURRENT}" != "${branch}" ]]; then
@@ -48,26 +43,26 @@ do
           TXTPULL=$((git pull origin $branch) 2>&1);
           NEWCHANGED=`git rev-parse --abbrev-ref HEAD`;
           if [[ "${branch}" == ${NEWCHANGED} ]] ; then
-              echo -e "${CSUCCESS}${NEWCHANGED} checked out & pulled"
+              echo -e "${gConf[colorSuccess]}${NEWCHANGED} checked out & pulled"
           else
               ERRCOUNT=$[ERRCOUNT + 1]
-              echo -e "\n${CERROR}${ERRMASCOT}\nERROR: could not check out ${branch}"
-              echo -e "${CHIGHLIGHT}Checkout output:${CNORMAL}\n ${TXTCHECKOUT} \n${CHIGHLIGHT}Pull output:${CNORMAL} ${TXTPULL}"
+              echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: could not check out ${branch}"
+              echo -e "${gConf[colorHighlight]}Checkout output:${gConf[colorNormal]}\n ${TXTCHECKOUT} \n${gConf[colorHighlight]}Pull output:${gConf[colorNormal]} ${TXTPULL}"
           fi
 
           cd - > /dev/null
         done
     else
-        echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Directory $dir does not exist ${CNORMAL}"
+        echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Directory $dir does not exist ${gConf[colorNormal]}"
     fi
 done
 
 if [[ "${ERRCOUNT}" == "0" ]] ; then
-    finalcol=${CSUCCESS}
+    finalcol=${gConf[colorSuccess]}
 else
-    finalcol=${CERROR}
+    finalcol=${gConf[colorError]}
 fi
 
-echo -e "\n${finalcol}Done with ${ERRCOUNT} errors${CNORMAL}"
+echo -e "\n${finalcol}Done with ${ERRCOUNT} errors${gConf[colorNormal]}"
 
 

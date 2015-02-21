@@ -3,29 +3,26 @@
 # Usage: git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && sudo bash install.sh
 source ~/.bashscripts/lib/commons.sh
 
-STARTDIR=${PWD}
-INSTDIR=~/.bashscripts
-SYMLINKDIR=/usr/local/bin
-cd $INSTDIR
+cd ${gConf[dirInstall]}
 git pull origin master
 SCRIPTS=(gcobranch gitmerge guorigin buildenv gitpress)
 for SCRIPT in ${SCRIPTS[@]}
 do
-	if [ ! -f ${SYMLINKDIR}/${SCRIPT} ]; then
+	if [ ! -h ${gConf[dirSymlinks]}/$SCRIPT ]; then
 		echo "Installing $SCRIPT"
-	    sudo ln -s $INSTDIR/scripts/${SCRIPT}.sh ${SYMLINKDIR}/${SCRIPT}
+	    sudo ln -s ${gConf[dirInstall]}/scripts/$SCRIPT.sh ${gConf[dirSymlinks]}/$SCRIPT
 	else
-		SYMLINK=$(readlink -f ${SYMLINKDIR}/${SCRIPT})
-		if [[ $SYMLINK != $INSTDIR/scripts/${SCRIPT}.sh ]]; then
+		SYMLINK=$(readlink -f ${gConf[dirSymlinks]}/$SCRIPT)
+		if [[ $SYMLINK != ${gConf[dirInstall]}/scripts/$SCRIPT.sh ]]; then
 			echo "Relinking existing $SCRIPT"
-			sudo rm ${SYMLINKDIR}/${SCRIPT}
-			sudo ln -s $INSTDIR/scripts/${SCRIPT}.sh ${SYMLINKDIR}/${SCRIPT}
+			sudo rm ${gConf[dirSymlinks]}/$SCRIPT
+			sudo ln -s ${gConf[dirInstall]}/scripts/$SCRIPT.sh ${gConf[dirSymlinks]}/$SCRIPT
 		else
 			echo "$SCRIPT already installed"
 		fi
 	fi
 done
-if [ ! -f ${SYMLINKDIR}/updatebashscripts ]; then
-	sudo ln -s $INSTDIR/install.sh ${SYMLINKDIR}/updatebashscripts
+if [ ! -h ${gConf[dirSymlinks]}/updatebashscripts ]; then
+	sudo ln -s ${gConf[dirInstall]}/install.sh ${gConf[dirSymlinks]}/updatebashscripts
 fi
-cd $STARTDIR
+cd ${gConf[dirStart]}

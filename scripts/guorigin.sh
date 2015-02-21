@@ -1,17 +1,12 @@
 #!/bin/bash
 # Update git origins from o-auth and SSH to native https in all git repos found in each of specified directories {dir}
 # Syntax: $ guorigin.sh {dir1} [{dir2} {dir3}...]
+source ~/.bashscripts/lib/commons.sh
 
-CNORMAL='\e[00m'
-CHIGHLIGHT="\e[01;36m"
-CERROR='\033[31m'
-CSUCCESS='\e[32m'
-ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|';
 ERRCOUNT=0
-
 if [ $# -lt 1 ]
   then
-    echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Incorrect arguments specified${CNORMAL}"
+    echo -e "\n${gConf[colorError]}${gConf[errorMascot]}ERROR: Incorrect arguments specified${gConf[colorNormal]}"
     echo "Usage: guorigin {dir1} [{dir2} {dir3}...]"   
     exit 0
 fi
@@ -27,7 +22,7 @@ do
 
         for d in `find $dir -name .git -type d`; do
             cd $d/.. > /dev/null
-            echo -e "\n${CHIGHLIGHT}Updating `pwd`${CNORMAL}"
+            echo -e "\n${gConf[colorHighlight]}Updating `pwd`${gConf[colorNormal]}"
             CURRENT=`git config --get remote.origin.url`;
             echo -e "Current Origin: ${CURRENT}"
             FILTERBY="x-oauth-basic"
@@ -39,14 +34,14 @@ do
                     `git remote set-url origin "${NEW}"`
                     NEWCHANGED=`git config --get remote.origin.url`;
                     if [[ "${NEW}" =~ ${NEWCHANGED} ]] ; then
-                        echo -e "${CSUCCESS}Origin changed to ${NEWCHANGED}${CNORMAL}"
+                        echo -e "${gConf[colorSuccess]}Origin changed to ${NEWCHANGED}${gConf[colorNormal]}"
                     else
                         ERRCOUNT=$[ERRCOUNT + 1]
-                        echo -e "${CERROR}ERROR: could not change origin${CNORMAL}"
+                        echo -e "${gConf[colorError]}ERROR: could not change origin${gConf[colorNormal]}"
                     fi
                 else
                     ERRCOUNT=$[ERRCOUNT + 1]
-                    echo -e "${CERROR}ERROR: ${NEW} is not a valid repository${CNORMAL}"
+                    echo -e "${gConf[colorError]}ERROR: ${NEW} is not a valid repository${gConf[colorNormal]}"
                 fi
             elif [[ "${CURRENT}" =~ "${FILTERBYSSH}" ]]; then
                 STR_ARRAY=(`echo $CURRENT | tr ':'  "\n"`)
@@ -55,14 +50,14 @@ do
                     `git remote set-url origin "${NEW}"`
                     NEWCHANGED=`git config --get remote.origin.url`;
                     if [[ "${NEW}" =~ ${NEWCHANGED} ]] ; then
-                        echo -e "${CSUCCESS}Origin changed to ${NEWCHANGED}${CNORMAL}"
+                        echo -e "${gConf[colorSuccess]}Origin changed to ${NEWCHANGED}${gConf[colorNormal]}"
                     else
                         ERRCOUNT=$[ERRCOUNT + 1]
-                        echo -e "${CERROR}ERROR: could not change origin${CNORMAL}"
+                        echo -e "${gConf[colorError]}ERROR: could not change origin${gConf[colorNormal]}"
                     fi
                 else
                     ERRCOUNT=$[ERRCOUNT + 1]
-                    echo -e "${CERROR}ERROR: ${NEW} is not a valid repository${CNORMAL}"
+                    echo -e "${gConf[colorError]}ERROR: ${NEW} is not a valid repository${gConf[colorNormal]}"
                 fi
             else
                 echo -e "Origin OK"
@@ -70,14 +65,14 @@ do
             cd - > /dev/null
         done
     else
-        echo -e "\n${CERROR}${ERRMASCOT}\nERROR: Directory $dir does not exist ${CNORMAL}"
+        echo -e "\n${gConf[colorError]}${gConf[errorMascot]}\nERROR: Directory $dir does not exist ${gConf[colorNormal]}"
     fi
 done
 
 if [[ "${ERRCOUNT}" == "0" ]] ; then
-    finalcol=${CSUCCESS}
+    finalcol=${gConf[colorSuccess]}
 else
-    finalcol=${CERROR}
+    finalcol=${gConf[colorError]}
 fi
 
-echo -e "\n${finalcol}Completed with ${ERRCOUNT} errors${CNORMAL}"
+echo -e "\n${finalcol}Completed with ${ERRCOUNT} errors${gConf[colorNormal]}"

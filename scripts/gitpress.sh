@@ -1,12 +1,7 @@
 #!/bin/bash 
 # compresses all commits in current local branch into single commit
 # Syntax: $ gitpress [options]
-
-CNORMAL='\e[00m'
-CHIGHLIGHT="\e[01;36m"
-CERROR='\033[31m'
-CSUCCESS='\e[32m'
-ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|'
+source ~/.bashscripts/lib/commons.sh
 ALLOWEDARGS=2
 OPTF=false
 OPTP=false
@@ -29,7 +24,7 @@ while getopts ":fp" opt; do
 done
 
 if [ $# -gt $ALLOWEDARGS ]; then
-    echo -e "${CERROR}${ERRMASCOT}ERROR: Received $# arguments, only ${ALLOWEDARGS} allowed! Syntax: gitpress [options]${CNORMAL}"
+    echo -e "${gConf[colorError]}${ERRMASCOT}ERROR: Received $# arguments, only ${ALLOWEDARGS} allowed! Syntax: gitpress [options]${gConf[colorNormal]}"
     exit 1
 fi
 
@@ -38,7 +33,7 @@ if [[ "$OPTF" = false ]]; then
     for UNSAFEBRANCH in ${UNSAFEBRANCHES[@]}
     do
       if [[ ${UNSAFEBRANCH} == ${CURRENTBRANCH} ]]; then
-        echo -e "${CERROR}${ERRMASCOT}ERROR: Use -f option to compress, branch name '${UNSAFEBRANCH}' is too generic${CNORMAL}"
+        echo -e "${gConf[colorError]}${ERRMASCOT}ERROR: Use -f option to compress, branch name '${UNSAFEBRANCH}' is too generic${gConf[colorNormal]}"
         exit 1 
       fi
     done

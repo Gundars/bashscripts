@@ -2,12 +2,7 @@
 # Merges current branch with {branch}, pushes changes to origin
 # If no {branch} is specified, "development" is used
 # Syntax: $ gitmerge [options] [branch]
-
-CNORMAL='\e[00m'
-CHIGHLIGHT="\e[01;36m"
-CERROR='\033[31m'
-CSUCCESS='\e[32m'
-ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|'
+source ~/.bashscripts/lib/commons.sh
 ERRCOUNT=0
 ALLOWEDARGS=1
 OPTP=false
@@ -26,7 +21,7 @@ while getopts ":p" opt; do
 done
 
 if [ $# -gt $ALLOWEDARGS ]; then
-    echo -e "${CERROR}${ERRMASCOT}ERROR: Received $# arguments, only ${ALLOWEDARGS} allowed! Syntax: gitmerge [options] [branch] ${CNORMAL}"
+    echo -e "${gConf[colorError]}${ERRMASCOT}ERROR: Received $# arguments, only ${ALLOWEDARGS} allowed! Syntax: gitmerge [options] [branch] ${gConf[colorNormal]}"
     exit 1
 fi
 
@@ -37,7 +32,7 @@ if [[ $1 && "$OPTP" = false ]]; then
 elif [[ $1 && "$OPTP" = true && $2 ]]; then 
     mergeBranch=$2
 fi
-echo -e "Merging ${CHIGHLIGHT}${currentBranch}${CNORMAL} with ${CHIGHLIGHT}${mergeBranch}${CNORMAL}"
+echo -e "Merging ${gConf[colorHighlight]}${currentBranch}${gConf[colorNormal]} with ${gConf[colorHighlight]}${mergeBranch}${gConf[colorNormal]}"
 
 CHECKOUT=$((git checkout $mergeBranch) 2>&1)
 if [[ "${CHECKOUT}" =~ "error: pathspec" ]]; then
@@ -70,7 +65,7 @@ if [ "$OPTP" = true ] ; then
       fi
     fi
     for prBranch in ${PRBRANCHES[@]}; do
-        echo -e "${CHIGHLIGHT}PR ${prBranch}:${CNORMAL} ${currentOrigin/%.git//compare/${prBranch}...${currentBranch}}"
+        echo -e "${gConf[colorHighlight]}PR ${prBranch}:${gConf[colorNormal]} ${currentOrigin/%.git//compare/${prBranch}...${currentBranch}}"
     done
 fi
 
