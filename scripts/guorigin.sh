@@ -63,4 +63,4 @@ do
 done
 
 messageExit
-exit 0
+

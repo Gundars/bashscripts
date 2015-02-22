@@ -9,6 +9,7 @@ function message {
 	   echo -e "$1"       
 	fi	
 }
+
 function messageSuccess {
 	if [ -z "$1" ]; then
 		echo "messageSuccess param 1 error"
@@ -16,6 +17,7 @@ function messageSuccess {
 	   echo -e "${gConf[colorSuccess]}$1${gConf[colorNormal]}"       
 	fi	
 }
+
 function messageHighlight {
 	if [ -z "$1" ]; then
 		echo "messageHightlight param 1 error"
@@ -23,24 +25,37 @@ function messageHighlight {
 	   echo -e "${gConf[colorHighlight]}$1${gConf[colorNormal]}"       
 	fi	
 }
+
 function messageError {
 	ERRCOUNT=$[ERRCOUNT + 1]
 	if [ -z "$1" ]; then
 		echo "messageError param 1 error"
 	else
-		echo -e "${gConf[colorError]}${gConf[errorMascot]} ERROR: $1${gConf[colorNormal]}"
+		if [ "$2" == false ]; then
+			local em=''
+			local er='\n'
+		else
+			local em=${gConf[errorMascot]}
+			local er='ERROR: '
+		fi
+		echo -e "${gConf[colorError]}${em}${er}$1${gConf[colorNormal]}"
 	fi
 }
+
 function messageExit {
 	if [[ "${ERRCOUNT}" == "0" ]] ; then
     	messageSuccess "Completed without errors"
+    	exit 0
 	else
-	    messageError "Completed with ${ERRCOUNT} errors"
+	    messageError "Completed with ${ERRCOUNT} errors" false
+	    exit 1
 	fi
 }
+
 function gitGetCurrentOrigin {
 	git config --get remote.origin.url
 }
+
 function gitSetCurrentOrigin {
 	if [ -z "$1" ]; then
 		echo "gitSetCurrentOrigin param 1 error"
@@ -48,6 +63,11 @@ function gitSetCurrentOrigin {
 		git remote set-url origin $1
 	fi
 }
+
+function gitGetCurrentBranch {
+	$(b=$(git symbolic-ref -q HEAD); { [ -n "$b" ] && echo ${b##refs/heads/}; } || echo HEAD)
+}
+
 function findAllGitDrectories {
 	find $1 -name .git -type d
 }

@@ -3,6 +3,7 @@
 # If no {branch} is specified, "development" is used
 # Syntax: $ gitmerge [options] [branch]
 source ~/.bashscripts/lib/commons.sh
+
 ERRCOUNT=0
 ALLOWEDARGS=1
 OPTP=false
@@ -21,26 +22,27 @@ while getopts ":p" opt; do
 done
 
 if [ $# -gt $ALLOWEDARGS ]; then
-    echo -e "${gConf[colorError]}${ERRMASCOT}ERROR: Received $# arguments, only ${ALLOWEDARGS} allowed! Syntax: gitmerge [options] [branch] ${gConf[colorNormal]}"
+    messageError "Received $# arguments, only ${ALLOWEDARGS} allowed!"
+    message "Syntax: gitmerge [options] [branch]"
     exit 1
 fi
 
-currentBranch="$(b=$(git symbolic-ref -q HEAD); { [ -n "$b" ] && echo ${b##refs/heads/}; } || echo HEAD)"
+currentBranch="$(gitGetCurrentBranch)"
 mergeBranch="development"
 if [[ $1 && "$OPTP" = false ]]; then 
     mergeBranch=$1
 elif [[ $1 && "$OPTP" = true && $2 ]]; then 
     mergeBranch=$2
 fi
-echo -e "Merging ${gConf[colorHighlight]}${currentBranch}${gConf[colorNormal]} with ${gConf[colorHighlight]}${mergeBranch}${gConf[colorNormal]}"
+message "Merging ${gConf[colorHighlight]}${currentBranch}${gConf[colorNormal]} with ${gConf[colorHighlight]}${mergeBranch}${gConf[colorNormal]}"
 
 CHECKOUT=$((git checkout $mergeBranch) 2>&1)
 if [[ "${CHECKOUT}" =~ "error: pathspec" ]]; then
-    echo -e "No such branch ${mergeBranch}. Creating..."
+    message "No such branch ${mergeBranch}. Creating..."
     git checkout -b $mergeBranch origin/$mergeBranch
     CURRENT=$((git rev-parse --abbrev-ref HEAD) 2>&1)
     if [[ "${CURRENT}" != "${mergeBranch}" ]]; then
-        echo -e "Error: could not switch to ${mergeBranch}. ABORTING"
+        messageError "could not switch to ${mergeBranch}"
         exit 1
     fi
 fi
@@ -50,7 +52,7 @@ git push origin $mergeBranch
 git checkout $currentBranch
 
 if [ "$OPTP" = true ] ; then
-    currentOrigin=`git config --get remote.origin.url`;
+    currentOrigin=$(gitGetCurrentOrigin)
     if [[ "${currentOrigin}" =~ "x-oauth-basic" ]]; then
       cleanedOrigin=(`echo $currentOrigin | tr '@' "\n"`)
       newOrigin="https://${cleanedOrigin[1]}"
@@ -69,4 +71,4 @@ if [ "$OPTP" = true ] ; then
     done
 fi
 
-exit 0
+messageExit

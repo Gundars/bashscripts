@@ -2,12 +2,13 @@
 # Checks out and pulls specified {branch} in all git repos found in each of specified {dir}
 # Syntax: $ gcobranch.sh {branch} {dir1} [{dir2} {dir3}...]
 source ~/.bashscripts/lib/commons.sh
+
 ERRCOUNT=0
 
 if [ $# -lt 2 ]
   then
     echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Incorrect arguments specified${gConf[colorNormal]}"
-    echo "Usage: gcobranch [branch] [dir] [dir]..."   
+    echo "Syntax: gcobranch [branch] [dir] [dir]..."   
     exit 0
 fi
 

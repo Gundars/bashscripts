@@ -2,6 +2,8 @@
 # compresses all commits in current local branch into single commit
 # Syntax: $ gitpress [options]
 source ~/.bashscripts/lib/commons.sh
+
+ERRCOUNT=0
 ALLOWEDARGS=2
 OPTF=false
 OPTP=false
@@ -24,16 +26,17 @@ while getopts ":fp" opt; do
 done
 
 if [ $# -gt $ALLOWEDARGS ]; then
-    echo -e "${gConf[colorError]}${ERRMASCOT}ERROR: Received $# arguments, only ${ALLOWEDARGS} allowed! Syntax: gitpress [options]${gConf[colorNormal]}"
+    messageError "Received $# arguments, only ${ALLOWEDARGS} allowed!"
+    message "Syntax: gitpress [options]"
     exit 1
 fi
 
-CURRENTBRANCH="$(b=$(git symbolic-ref -q HEAD); { [ -n "$b" ] && echo ${b##refs/heads/}; } || echo HEAD)"
+CURRENTBRANCH="$(gitGetCurrentBranch)"
 if [[ "$OPTF" = false ]]; then 
     for UNSAFEBRANCH in ${UNSAFEBRANCHES[@]}
     do
       if [[ ${UNSAFEBRANCH} == ${CURRENTBRANCH} ]]; then
-        echo -e "${gConf[colorError]}${ERRMASCOT}ERROR: Use -f option to compress, branch name '${UNSAFEBRANCH}' is too generic${gConf[colorNormal]}"
+        messageError "Use -f option to compress, branch name '${UNSAFEBRANCH}' is too generic"
         exit 1 
       fi
     done
@@ -45,7 +48,8 @@ SAFEPUSH="git push origin +${CURRENTBRANCH}"
 if [[ "$OPTP" = true ]]; then 
     $(${SAFEPUSH})
 else
-    echo -e "Use command '${SAFEPUSH}' to overwrite remote ${CURRENTBRANCH} branch"
+    message "Use command '${SAFEPUSH}' to overwrite remote ${CURRENTBRANCH} branch"
 fi
 
-exit 0
+messageExit
+
