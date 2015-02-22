@@ -6,24 +6,21 @@ source ~/.bashscripts/lib/commons.sh
 ERRCOUNT=0
 if [ $# -lt 1 ]
   then
-    echo -e "\n${gConf[colorError]}${gConf[errorMascot]}ERROR: Incorrect arguments specified${gConf[colorNormal]}"
-    echo "Usage: guorigin {dir1} [{dir2} {dir3}...]"   
-    exit 0
+    messageError "Incorrect arguments specified"
+    message "Usage: guorigin {dir1} [{dir2} {dir3}...]"   
+    exit 1
 fi
 
 directories="${@:1}";
-
 for dir in $directories
 do
     if [ -d "$dir" ]; then    
         cd $dir>/dev/null;
-        echo -e "\nScanning ${PWD}";
         cd ->/dev/null
-
-        for d in `find $dir -name .git -type d`; do
+        for d in `findAllGitDrectories $dir`; do
             cd $d/.. > /dev/null
-            echo -e "\n${gConf[colorHighlight]}Updating `pwd`${gConf[colorNormal]}"
-            CURRENT=`git config --get remote.origin.url`;
+            messageHighlight "\nUpdating ${PWD}"
+            CURRENT=$(gitGetCurrentOrigin)
             echo -e "Current Origin: ${CURRENT}"
             FILTERBY="x-oauth-basic"
             FILTERBYSSH="git@github.com:"
@@ -31,48 +28,39 @@ do
                 STR_ARRAY=(`echo $CURRENT | tr '@'  "\n"`)
                 NEW="https://${STR_ARRAY[1]}"
                 if [[ "${NEW}" =~ "https://github.com/".*".git" ]] ; then
-                    `git remote set-url origin "${NEW}"`
-                    NEWCHANGED=`git config --get remote.origin.url`;
+                    gitSetCurrentOrigin $NEW
+                    NEWCHANGED=$(gitGetCurrentOrigin)
                     if [[ "${NEW}" =~ ${NEWCHANGED} ]] ; then
-                        echo -e "${gConf[colorSuccess]}Origin changed to ${NEWCHANGED}${gConf[colorNormal]}"
+                        messageSuccess "Origin changed to ${NEWCHANGED}"
                     else
-                        ERRCOUNT=$[ERRCOUNT + 1]
-                        echo -e "${gConf[colorError]}ERROR: could not change origin${gConf[colorNormal]}"
+                        messageError "unable to change origin"
                     fi
                 else
-                    ERRCOUNT=$[ERRCOUNT + 1]
-                    echo -e "${gConf[colorError]}ERROR: ${NEW} is not a valid repository${gConf[colorNormal]}"
+                    messageError "${NEW} is not a valid repository"
                 fi
             elif [[ "${CURRENT}" =~ "${FILTERBYSSH}" ]]; then
                 STR_ARRAY=(`echo $CURRENT | tr ':'  "\n"`)
                 NEW="https://github.com/${STR_ARRAY[1]}"
                 if [[ "${NEW}" =~ "https://github.com/".*".git" ]] ; then
-                    `git remote set-url origin "${NEW}"`
-                    NEWCHANGED=`git config --get remote.origin.url`;
+                    gitSetCurrentOrigin $NEW
+                    NEWCHANGED=$(gitGetCurrentOrigin)
                     if [[ "${NEW}" =~ ${NEWCHANGED} ]] ; then
-                        echo -e "${gConf[colorSuccess]}Origin changed to ${NEWCHANGED}${gConf[colorNormal]}"
+                        messageSuccess "Origin changed to ${NEWCHANGED}"
                     else
-                        ERRCOUNT=$[ERRCOUNT + 1]
-                        echo -e "${gConf[colorError]}ERROR: could not change origin${gConf[colorNormal]}"
+                        messageError "unable to change origin"
                     fi
                 else
-                    ERRCOUNT=$[ERRCOUNT + 1]
-                    echo -e "${gConf[colorError]}ERROR: ${NEW} is not a valid repository${gConf[colorNormal]}"
+                    messageError "${NEW} is not a valid repository"
                 fi
             else
-                echo -e "Origin OK"
+                message "Origin OK"
             fi
             cd - > /dev/null
         done
     else
-        echo -e "\n${gConf[colorError]}${gConf[errorMascot]}\nERROR: Directory $dir does not exist ${gConf[colorNormal]}"
+        messageError "Directory ${dir} does not exist"
     fi
 done
 
-if [[ "${ERRCOUNT}" == "0" ]] ; then
-    finalcol=${gConf[colorSuccess]}
-else
-    finalcol=${gConf[colorError]}
-fi
-
-echo -e "\n${finalcol}Completed with ${ERRCOUNT} errors${gConf[colorNormal]}"
+messageExit
+exit 0
