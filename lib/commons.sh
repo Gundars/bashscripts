@@ -1,6 +1,7 @@
 #!/bin/bash
 # Container of all common functions
 source ~/.bashscripts/config/global.sh
+source ~/.bashscripts/config/user.sh
 
 function message {
 	if [ -z "$1" ]; then

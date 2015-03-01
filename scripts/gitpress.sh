@@ -4,7 +4,7 @@
 source ~/.bashscripts/lib/commons.sh
 
 ERRCOUNT=0
-ALLOWEDARGS=2
+ALLOWEDARGS=0
 OPTF=false
 OPTP=false
 UNSAFEBRANCHES=(development test master)

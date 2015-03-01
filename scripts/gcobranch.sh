@@ -4,8 +4,9 @@
 source ~/.bashscripts/lib/commons.sh
 
 ERRCOUNT=0
+ALLOWEDARGS=2
 
-if [ $# -lt 2 ]
+if [ $# -lt $ALLOWEDARGS ]
   then
     echo -e "\n${gConf[colorError]}${ERRMASCOT}\nERROR: Incorrect arguments specified${gConf[colorNormal]}"
     echo "Syntax: gcobranch [branch] [dir] [dir]..."   

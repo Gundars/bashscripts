@@ -1,24 +1,21 @@
 #!/bin/bash
 # Change build number on environmnet
 # Syntax: $ buildenv {env} {branch} {build number}
-# {env} syntax: www_domain_extension
+# { env} syntax: www_domain_extension
 # {branch} syntax: dev | test | staging
 # {build number} syntax: integer 1-5 digits long
 source ~/.bashscripts/lib/commons.sh
 
 ERRCOUNT=0
+ALLOWEDARGS=3
 ENV=$1
-ENVREGEX="^w{3}_.*_[a-zA-Z]{2,4}$"
 BRANCH=$2
-BRANCHREGEX="^(dev|test|staging)$"
 BNR=$3
+ENVREGEX="^w{3}_.*_[a-zA-Z]{2,4}$"
+BRANCHREGEX="^(dev|test|staging)$"
 BNRREGEX="[0-9]{1,5}"
-TMPDIR=~/.bashscripts/tmp
-ERRMASCOT='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_|';
-ERRCOUNT=0
-REPO="https/link/to/encriched.git"
 
-if [ $# -lt 3 ]; then
+if [ $# -lt $ALLOWEDARGS ]; then
     messageError "Incorrect arguments specified"
     echo "Syntax: buildenv {env} {branch} {build number}"
     echo "{env} syntax: www_domain_extension"
@@ -37,25 +34,29 @@ if ! [[ $BRANCH =~ $BRANCHREGEX ]]; then
 fi
 
 if ! [[ $BNR =~ $BNRREGEX ]]; then
-	messageError "Bad build number$"
+	messageError "Bad build number"
 	message "{build number} syntax: integer 1-5 digits long"
 fi
 
-if [[ $REPO =~ "https/link/to/encriched.git" ]]; then
+if [[ uConf[enrichedRepository] =~ "https/link/to/encriched.git" ]]; then
 	messageError "Bad repository name"
-	message "Please change line 21 'https/link/to/encriched.git' in file ~/.bashscripts/buildenv.sh to valid link to repository"
+	message "Please change line 4 'https/link/to/encriched.git' in file ~/.bashscripts/config/user.sh to valid link to enriched github repository"
 fi
 
 if ! [[ $ERRCOUNT =~ 0 ]]; then
     messageExit
 fi
 
-if ! [ -d "$TMPDIR" ]; then 
-    git clone $REPO $TMPDIR
+if ! [ -d gConf[dirTmp] ]; then
+    git clone uConf[enrichedRepository] gConf[dirTmp]
 fi
 cd gConf[dirTmp]
 git pull origin master
 FILE=environment_definition/${BRANCH}1/environment_definition.def
+if ! [ -f $FILE ]; then
+    messageError "File ${FILE} does not exist"
+    messageExit
+fi
 sed -i "s/^${ENV}.*/${ENV} = ${BNR}/g" $FILE
 git add $FILE
 git commit -m "${ENV} to ${BNR}"

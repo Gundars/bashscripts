@@ -11,4 +11,3 @@ gConf[colorError]='\033[31m'
 gConf[colorSuccess]='\e[32m'
 gConf[errorMascot]='            __\n           / _)\n    .-^^^-/ /\n __/       /\n<__.|_|-|_| '
 
-
