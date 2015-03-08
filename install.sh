@@ -7,7 +7,7 @@ INSTDIR=~/.bashscripts
 SYMLINKDIR=/usr/local/bin
 cd $INSTDIR
 git pull origin master
-SCRIPTS=(gcobranch gitmerge guorigin buildenv gitpress)
+SCRIPTS=(gcobranch gitmerge guorigin buildenv gitpress git-branc-retore git-ceck-cange)
 for SCRIPT in ${SCRIPTS[@]}
 do
 	if [ ! -f ${SYMLINKDIR}/${SCRIPT} ]; then
