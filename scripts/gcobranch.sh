@@ -1,6 +1,6 @@
 #!/bin/bash
 # Checks out and pulls specified {branch} in all git repos found in each of specified {dir}
-# Syntax: $ gcobranch.sh {branch} {dir1} [{dir2} {dir3}...]
+# Syntax: $ gcobranch {branch} {dir1} [{dir2} {dir3}...]
 source ~/.bashscripts/lib/commons.sh
 
 ERRCOUNT=0
