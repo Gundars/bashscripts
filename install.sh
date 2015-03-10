@@ -5,7 +5,7 @@ source ~/.bashscripts/lib/commons.sh
 
 cd ${gConf[dirInstall]}
 git pull origin master
-SCRIPTS=(gcobranch gitmerge guorigin buildenv gitpress)
+SCRIPTS=(gcobranch gitmerge gitscan buildenv gitpress)
 for SCRIPT in ${SCRIPTS[@]}
 do
 	if [ ! -h ${gConf[dirSymlinks]}/$SCRIPT ]; then

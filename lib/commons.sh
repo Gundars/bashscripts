@@ -72,3 +72,7 @@ function gitGetCurrentBranch {
 function findAllGitDrectories {
 	find $1 -name .git -type d
 }
+
+function gitFetchAll {
+    git fetch --all
+}
