@@ -42,7 +42,7 @@ echo -e "Merging ${CHIGHLIGHT}${currentBranch}${CNORMAL} with ${CHIGHLIGHT}${mer
 CHECKOUT=$((git checkout $mergeBranch) 2>&1)
 if [[ "${CHECKOUT}" =~ "error: pathspec" ]]; then
     echo -e "No such branch ${mergeBranch}. Creating..."
-    git checkout -b $mergeBranch origin/$mergeBranch
+    $((git checkout -b $mergeBranch origin/$mergeBranch) 2>&1)
     CURRENT=$((git rev-parse --abbrev-ref HEAD) 2>&1)
     if [[ "${CURRENT}" != "${mergeBranch}" ]]; then
         echo -e "Error: could not switch to ${mergeBranch}. ABORTING"
