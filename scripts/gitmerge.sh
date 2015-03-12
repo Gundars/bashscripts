@@ -39,7 +39,7 @@ message "Merging ${gConf[colorHighlight]}${currentBranch}${gConf[colorNormal]} w
 CHECKOUT=$((git checkout $mergeBranch) 2>&1)
 if [[ "${CHECKOUT}" =~ "error: pathspec" ]]; then
     message "No such branch ${mergeBranch}. Creating..."
-    git checkout -b $mergeBranch origin/$mergeBranch
+    $((git checkout -b $mergeBranch origin/$mergeBranch) 2>&1)
     CURRENT=$((git rev-parse --abbrev-ref HEAD) 2>&1)
     if [[ "${CURRENT}" != "${mergeBranch}" ]]; then
         messageError "could not switch to ${mergeBranch}"
