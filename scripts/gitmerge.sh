@@ -4,70 +4,47 @@
 # Syntax: $ gitmerge [options] [branch]
 source ~/.bashscripts/lib/commons.sh
 
-ERRCOUNT=0
-ALLOWEDARGS=1
-OPTP=false
-PRBRANCHES=(test master)
+erroCount=0
+optP=false
+prBranches=(test master)
 
 while getopts ":p" opt; do
   case $opt in
     p)
-      OPTP=true
-      ALLOWEDARGS=$[ALLOWEDARGS + 1]
+      optP=true
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+        messageError "Invalid option: -$OPTARG" >&2
+        messageExit
       ;;
   esac
 done
 
-if [ $# -gt $ALLOWEDARGS ]; then
-    messageError "Received $# arguments, only ${ALLOWEDARGS} allowed!"
-    message "Syntax: gitmerge [options] [branch]"
-    exit 1
-fi
-
 currentBranch="$(gitGetCurrentBranch)"
 mergeBranch="development"
-if [[ $1 && "$OPTP" = false ]]; then 
+if [[ $1 && "$optP" = false ]]; then 
     mergeBranch=$1
-elif [[ $1 && "$OPTP" = true && $2 ]]; then 
+elif [[ $1 && "$optP" = true && $2 ]]; then 
     mergeBranch=$2
 fi
-message "Merging ${gConf[colorHighlight]}${currentBranch}${gConf[colorNormal]} with ${gConf[colorHighlight]}${mergeBranch}${gConf[colorNormal]}"
+message "Merging ${gConf[colH]}${currentBranch}${gConf[colN]} with ${gConf[colH]}${mergeBranch}${gConf[colN]}"
 
-CHECKOUT=$((git checkout $mergeBranch) 2>&1)
-if [[ "${CHECKOUT}" =~ "error: pathspec" ]]; then
-    message "No such branch ${mergeBranch}. Creating..."
-    $((git checkout -b $mergeBranch origin/$mergeBranch) 2>&1)
-    CURRENT=$((git rev-parse --abbrev-ref HEAD) 2>&1)
-    if [[ "${CURRENT}" != "${mergeBranch}" ]]; then
-        messageError "could not switch to ${mergeBranch}"
-        exit 1
-    fi
+gitCheckoutBranchWithOrigin $mergeBranch
+currentBranch=$(gitGetCurrentBranch)
+if [[ "${currentBranch}" != "${mergeBranch}" ]]; then
+    messageExit
 fi
+
 git pull origin $mergeBranch
 git merge --no-ff $currentBranch
 git push origin $mergeBranch
 git checkout $currentBranch
 
-if [ "$OPTP" = true ] ; then
-    currentOrigin=$(gitGetCurrentOrigin)
-    if [[ "${currentOrigin}" =~ "x-oauth-basic" ]]; then
-      cleanedOrigin=(`echo $currentOrigin | tr '@' "\n"`)
-      newOrigin="https://${cleanedOrigin[1]}"
-      if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
-         currentOrigin=$newOrigin
-      fi
-    elif [[ "${currentOrigin}" =~ "git@github.com:" ]]; then
-      cleanedOrigin=(`echo $currentOrigin | tr ':' "\n"`)
-      newOrigin="https://github.com/${cleanedOrigin[1]}"
-      if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
-         currentOrigin=$newOrigin
-      fi
-    fi
-    for prBranch in ${PRBRANCHES[@]}; do
-        echo -e "${gConf[colorHighlight]}PR ${prBranch}:${gConf[colorNormal]} ${currentOrigin/%.git//compare/${prBranch}...${currentBranch}}"
+if [ "$optP" = true ] ; then
+   origin=$(gitOriginAnyToHttps)
+   message "\n"
+    for prBranch in ${prBranches[@]}; do
+        message "${gConf[colH]}PR ${prBranch}:${gConf[colN]} ${origin/%.git//compare/${prBranch}...${currentBranch}}"
     done
 fi
 

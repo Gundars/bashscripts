@@ -3,40 +3,41 @@
 # Syntax: $ gitpress [options]
 source ~/.bashscripts/lib/commons.sh
 
-ERRCOUNT=0
-ALLOWEDARGS=0
-OPTF=false
-OPTP=false
-UNSAFEBRANCHES=(development test master)
+erroCount=0
+maxArgsCount=0
+optF=false
+optP=false
+unsafeBranches=(development test master)
 
 while getopts ":fp" opt; do
   case $opt in
     f)
-      OPTF=true
-      ALLOWEDARGS=$[ALLOWEDARGS + 1]
+      optF=true
+      maxArgsCount=$[maxArgsCount + 1]
       ;;
     p)
-      OPTP=true
-      ALLOWEDARGS=$[ALLOWEDARGS + 1]
+      optP=true
+      maxArgsCount=$[maxArgsCount + 1]
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+        messageError "Invalid option: -$OPTARG" >&2
+        messageExit
       ;;
   esac
 done
 
-if [ $# -gt $ALLOWEDARGS ]; then
-    messageError "Received $# arguments, only ${ALLOWEDARGS} allowed!"
+if [ $# -gt $maxArgsCount ]; then
+    messageError "Received $# arguments, only ${allowedArgsCount} allowed!"
     message "Syntax: gitpress [options]"
     exit 1
 fi
 
-CURRENTBRANCH="$(gitGetCurrentBranch)"
-if [[ "$OPTF" = false ]]; then 
-    for UNSAFEBRANCH in ${UNSAFEBRANCHES[@]}
+currentBranch="$(gitGetCurrentBranch)"
+if [[ "$optF" = false ]]; then 
+    for unsafeBranche in ${unsafeBranches[@]}
     do
-      if [[ ${UNSAFEBRANCH} == ${CURRENTBRANCH} ]]; then
-        messageError "Use -f option to compress, branch name '${UNSAFEBRANCH}' is too generic"
+      if [[ ${unsafeBranche} == ${currentBranch} ]]; then
+        messageError "Use -f option to compress, branch name '${unsafeBranche}' is too generic"
         exit 1 
       fi
     done
@@ -44,11 +45,11 @@ fi
 
 git reset $(git commit-tree HEAD^{tree} -m "Compress")
 
-SAFEPUSH="git push origin +${CURRENTBRANCH}"
-if [[ "$OPTP" = true ]]; then 
-    $(${SAFEPUSH})
+safePush="git push origin +${currentBranch}"
+if [[ "$optP" = true ]]; then 
+    $(${safePush})
 else
-    message "Use command '${SAFEPUSH}' to overwrite remote ${CURRENTBRANCH} branch"
+    message "Use command '${safePush}' to overwrite remote ${currentBranch} branch"
 fi
 
 messageExit

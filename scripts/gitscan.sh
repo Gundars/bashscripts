@@ -7,25 +7,22 @@
 # -c create test and development branches in sync with origin
 source ~/.bashscripts/lib/commons.sh
 
-ERRCOUNT=0
-ALLOWEDARGS=0
-OPTO=false
-OPTC=false
-OPTM=false
+erroCount=0
+minArgsCount=1
+optO=false
+optC=false
+optM=false
 
 while getopts "ocm" opt; do
   case $opt in
     o)
-      OPTO=true
-      ALLOWEDARGS=$[ALLOWEDARGS + 1]
+      optO=true
       ;;
     c)
-      OPTC=true
-      ALLOWEDARGS=$[ALLOWEDARGS + 1]
+      optC=true
       ;;
     m)
-      OPTM=true
-      ALLOWEDARGS=$[ALLOWEDARGS + 1]
+      optM=true
       ;;
     \?)
         messageError "Invalid option: -$OPTARG" >&2
@@ -34,12 +31,42 @@ while getopts "ocm" opt; do
   esac
 done
 
-if [ $# -lt $ALLOWEDARGS ]
-  then
+removeOptionsFromArguments ${@:1}
+
+if [ ${#argumentsWithoutOptions[@]} -lt $minArgsCount ]; then
     messageError "Incorrect arguments specified"
-    message "Usage: gitscan [options] {dir1} [{dir2} {dir3}...]"
-    exit 1
+    message "Syntax: gitscan [options] {dir1} [{dir2} {dir3}...]"
+    messageExit
 fi
+
+for dir in $argumentsWithoutOptions
+do
+    if [ -d "$dir" ]; then    
+        cd $dir>/dev/null;
+        cd ->/dev/null
+        for d in `findAllGitDrectories $dir`; do
+            cd $d/.. > /dev/null
+            pwd=$(pwd)
+            messageHighlight "\nScanning ${PWD}"
+            if [[ "$optO" = true ]]; then
+                updateOriginLinks
+            fi
+            if [[ "$optC" = true ]]; then
+                createBranches 'development' 'test'
+            fi
+            if [[ "$optM" = true ]]; then
+                listAllModifiedFiles $PWD
+            fi
+            cd - > /dev/null
+        done
+    else
+        messageError "Directory ${dir} does not exist"
+    fi
+done
+
+messageExit
+
+#===============================================================
 
 function updateOriginLinks {
     CURRENT=$(gitGetCurrentOrigin)
@@ -102,40 +129,3 @@ function createBranches {
         fi
     done
 }
-
-# Remove options from args
-ARGSORIGINAL=${@:1}
-ARGSNEW=()
-for ARG in ${ARGSORIGINAL[@]}
-do
-    if [[ ${ARG:0:1} != "-"  ]]; then
-        ARGSNEW+=($ARG)
-    fi
-done
-
-for dir in $ARGSNEW
-do
-    if [ -d "$dir" ]; then    
-        cd $dir>/dev/null;
-        cd ->/dev/null
-        for d in `findAllGitDrectories $dir`; do
-            cd $d/.. > /dev/null
-            PWD=$(pwd)
-            messageHighlight "\nScanning ${PWD}"
-            if [[ "$OPTO" = true ]]; then
-                updateOriginLinks
-            fi
-            if [[ "$OPTC" = true ]]; then
-                createBranches 'development' 'test'
-            fi
-            if [[ "$OPTM" = true ]]; then
-                listAllModifiedFiles $PWD
-            fi
-            cd - > /dev/null
-        done
-    else
-        messageError "Directory ${dir} does not exist"
-    fi
-done
-
-messageExit
