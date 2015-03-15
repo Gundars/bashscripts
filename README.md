@@ -26,10 +26,22 @@ Syntax: `$ gitmerge [options] [branch]`
 Options:
 - `-p`  generate links to test/master pull requests
 
-###guorigin
-Git update origin - updates git remote origins format from o-auth and SSH to native https in all git repos found in each of specified directories {dir}
+###gitscan
+Scan all directories {dir} for git repositories and perform actions based on options
 
-Syntax: `$ guorigin {dir1} [{dir2} {dir3}...]`
+Syntax: `$ gitscan [options] {dir1} [{dir2} {dir3}...]`
+
+Options:
+- `-o`  update remote origin URLs format from oauth/ssh to https
+- `-m`  list all modified files
+- `-c`  create test and development branches in sync with origin
+
+###buildenv
+Changes {build number} for a {branch} on site environmnet {env}
+
+**Warning:** Before using script, change line 21 - swap dummy string with https link to enriched github repository
+
+Syntax: `$ buildenv {env} {branch} {build number}`
 
 ###gitpress
 Git compress - compresses all commits in current local branch into single commit
@@ -42,9 +54,3 @@ Options:
 
 **Warning:** This will disable history, allign with master to fix pull requests
 
-###buildenv
-Changes {build number} for a {branch} on site environmnet {env}
-
-**Warning:** Before using script, change line 21 - swap dummy string with https link to enriched github repository
-
-Syntax: `$ buildenv {env} {branch} {build number}`
