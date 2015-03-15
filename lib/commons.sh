@@ -137,7 +137,12 @@ function gitCheckoutBranchWithOrigin {
                 messageError "Branch ${branchToCheckout} does not exist in origin"
             fi
         fi
+    else
+    	if [[ "${branchToCheckout}" != $(gitGetCurrentBranch) ]]; then
+    	    messageError "Failed to check out ${branchToCheckout}"
+    	fi
     fi
+    
 }
 
 function gitLastCommit {
