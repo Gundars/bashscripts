@@ -7,7 +7,7 @@ erroCount=0
 minArgsCount=2
 
 if [ $# -lt $minArgsCount ]; then
-    messageError "Received $# arguments, only ${allowedArgsCount} allowed!"
+    messageError "Received $# arguments, only ${minArgsCount} allowed!"
     message "Syntax: gcobranch [branch] [dir] [dir]..."
     messageExit
 fi
