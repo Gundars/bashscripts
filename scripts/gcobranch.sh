@@ -29,8 +29,10 @@ do
             message "Current branch: ${currentBranch}"
             if [[ "${currentBranch}" != "${checkoutBranch}" ]]; then
                 gitCheckoutBranchWithOrigin $checkoutBranch
+                checkedout=" checked out and"
             else
-                message "Already on ${branch}"
+                message "Already on ${checkoutBranch}"
+                checkedout=""
             fi
 
             currentBranch=$(gitGetCurrentBranch)
@@ -38,7 +40,7 @@ do
                 pull=$((git pull origin $checkoutBranch) 2>&1)
                 lastCommit=$(gitLastCommit)
                 message "Last commit: ${lastCommit}"
-                messageSuccess "${checkoutBranch} checked out and pulled"
+                messageSuccess "${checkoutBranch}${checkedout} pulled"
             fi
           cd - > /dev/null
         done

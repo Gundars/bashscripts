@@ -36,7 +36,7 @@ function messageError {
 			local em=''
 			local er='\n'
 		else
-			local em=${gConf[errorMascot]}
+			local em=$(getRandomErrorMascot)
 			local er='ERROR: '
 		fi
 		echo -e "${gConf[colE]}${em}${er}$1${gConf[colN]}"
@@ -44,7 +44,8 @@ function messageError {
 }
 
 function messageExit {
-	if [[ "${erroCount}" == "0" ]] ; then
+    message "\n"
+    if [[ "${erroCount}" == "0" ]] ; then
     	messageSuccess "Completed without errors"
     	exit 0
 	else
@@ -59,27 +60,23 @@ function exitIfErrors {
     fi
 }
 
-function removeOptionsFromArguments (
-    arguments=$1
+#pass an array of all orginal args except 0 !
+function removeOptionsFromArguments {
     argumentsWithoutOptions=()
-    for arg in ${arguments[@]}
+    for arg in "$@"
     do
         if [[ ${arg:0:1} != "-"  ]]; then
             argumentsWithoutOptions+=($arg)
         fi
     done
-)
+}
 
 function gitGetCurrentOrigin {
 	git config --get remote.origin.url
 }
 
 function gitSetCurrentOrigin {
-	if [ -z "$1" ]; then
-		echo "gitSetCurrentOrigin param 1 error"
-	else
-		git remote set-url origin $1
-	fi
+    git remote set-url origin $1
 }
 
 function gitGetCurrentBranch {
@@ -92,25 +89,29 @@ function findAllGitDrectories {
 }
 
 function gitFetchAll {
-    git fetch --all
+    local a=$((git fetch --all) 2>&1)
 }
 
+function gitCheckout {
+     local a=$((git checkout $1) 2>&1)
+}
 function gitOriginAnyToHttps {
     local currentOrigin=$(gitGetCurrentOrigin)
     if [[ "${currentOrigin}" =~ "x-oauth-basic" ]]; then
       local cleanedOrigin=(`echo $currentOrigin | tr '@' "\n"`)
       local newOrigin="https://${cleanedOrigin[1]}"
       if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
-         currentOrigin=$newOrigin
+         local currentOrigin=$newOrigin
       fi
     elif [[ "${currentOrigin}" =~ "git@github.com:" ]]; then
       local cleanedOrigin=(`echo $currentOrigin | tr ':' "\n"`)
       local newOrigin="https://github.com/${cleanedOrigin[1]}"
       if [[ "${newOrigin}" =~ "https://github.com/".*".git" ]] ; then
-         currentOrigin=$newOrigin
+         local currentOrigin=$newOrigin
       fi
     fi
-    echo currentOrigin
+
+    echo $currentOrigin
 }
 
 function gitDiffDeleted {
@@ -122,18 +123,18 @@ function gitDiffAdded {
 }
 
 function gitCheckoutBranchWithOrigin {
-    mergeBranch=$1
-    checkout=$((git checkout $mergeBranch) 2>&1)
+    local branchToCheckout=$1
+    checkout=$((git checkout $branchToCheckout) 2>&1)
     if [[ "${checkout}" =~ "error: pathspec" ]]; then
-        message "No such branch ${mergeBranch}. Creating..."
-        $((git checkout -b $mergeBranch origin/$mergeBranch) &> /dev/null)
+        message "No such branch ${branchToCheckout}. Creating..."
+        $((git checkout -b $branchToCheckout origin/$branchToCheckout) &> /dev/null)
         currentBranch=$(gitGetCurrentBranch)
-        if [[ "${currentBranch}" != "${mergeBranch}" ]]; then
+        if [[ "${currentBranch}" != "${branchToCheckout}" ]]; then
             $((git fetch --all) &> /dev/null)
-            $((git fetch origin $mergeBranch:$mergeBranch) &> /dev/null)
+            $((git fetch origin $mergeBranch:branchToCheckout) &> /dev/null)
             currentBranch=$(gitGetCurrentBranch)
-            if [[ "${currentBranch}" != "${mergeBranch}" ]]; then
-                messageError "Branch ${mergeBranch} does not exist in origin"
+            if [[ "${currentBranch}" != "${branchToCheckout}" ]]; then
+                messageError "Branch ${branchToCheckout} does not exist in origin"
             fi
         fi
     fi
@@ -144,3 +145,10 @@ function gitLastCommit {
     echo $lc
 }
 
+function getRandomErrorMascot {
+    printf $'%s' "${errorMascots[$(($(rand "${#errorMascots[*]}")+1))]}"
+}
+
+function rand {
+	printf $((  $1 *  RANDOM  / 32767   ))
+}

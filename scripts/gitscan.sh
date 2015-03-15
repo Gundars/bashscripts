@@ -7,6 +7,43 @@
 # -c create test and development branches in sync with origin
 source ~/.bashscripts/lib/commons.sh
 
+function updateOriginUrl {
+    local currentOrigin=$(gitGetCurrentOrigin)
+    local httpsOrigin=$(gitOriginAnyToHttps)
+    message "Current origins URL: ${currentOrigin}"
+    if [[ "${currentOrigin}" != "${httpsOrigin}" ]]; then
+        gitSetCurrentOrigin $httpsOrigin
+        local newOrigin=$(gitGetCurrentOrigin)
+        if [[ "${newOrigin}" =  "${httpsOrigin}" ]]; then
+            messageSuccess "Origins url changed to ${newOrigin}"
+        else
+            messageError "Unable to change origins url"
+        fi
+    else
+        message "URL OK"
+    fi
+}
+
+function listAllModifiedFiles {
+    modified=$(git status --porcelain)
+    if [ -n "$modified" ]; then
+        messageSuccess "\nModified files found in ${1}"
+        git status --porcelain
+    fi
+}
+
+function createBranches {
+    currentBranch=$(gitGetCurrentOrigin)
+    gitCheckout master
+    gitFetchAll
+    for branch in "$@"
+    do
+        message "Creating branch ${branch} origin/${branch}"
+        gitCheckoutBranchWithOrigin $branch
+    done
+    gitCheckout $currentBranch
+}
+
 erroCount=0
 minArgsCount=1
 optO=false
@@ -31,7 +68,7 @@ while getopts "ocm" opt; do
   esac
 done
 
-removeOptionsFromArguments ${@:1}
+removeOptionsFromArguments "$@"
 
 if [ ${#argumentsWithoutOptions[@]} -lt $minArgsCount ]; then
     messageError "Incorrect arguments specified"
@@ -39,7 +76,7 @@ if [ ${#argumentsWithoutOptions[@]} -lt $minArgsCount ]; then
     messageExit
 fi
 
-for dir in $argumentsWithoutOptions
+for dir in "${argumentsWithoutOptions[@]}"
 do
     if [ -d "$dir" ]; then    
         cd $dir>/dev/null;
@@ -49,13 +86,13 @@ do
             pwd=$(pwd)
             messageHighlight "\nScanning ${PWD}"
             if [[ "$optO" = true ]]; then
-                updateOriginLinks
+                updateOriginUrl
             fi
             if [[ "$optC" = true ]]; then
-                createBranches 'development' 'test'
+                createBranches "development" "test"
             fi
             if [[ "$optM" = true ]]; then
-                listAllModifiedFiles $PWD
+                listAllModifiedFiles $pwd
             fi
             cd - > /dev/null
         done
@@ -65,67 +102,3 @@ do
 done
 
 messageExit
-
-#===============================================================
-
-function updateOriginLinks {
-    CURRENT=$(gitGetCurrentOrigin)
-    echo -e "Current Origin: ${CURRENT}"
-    FILTERBY="x-oauth-basic"
-    FILTERBYSSH="git@github.com:"
-    if [[ "${CURRENT}" =~ "${FILTERBY}" ]]; then
-        STR_ARRAY=(`echo $CURRENT | tr '@'  "\n"`)
-        NEW="https://${STR_ARRAY[1]}"
-        if [[ "${NEW}" =~ "https://github.com/".*".git" ]] ; then
-            gitSetCurrentOrigin $NEW
-            NEWCHANGED=$(gitGetCurrentOrigin)
-            if [[ "${NEW}" =~ ${NEWCHANGED} ]] ; then
-                messageSuccess "Origin changed to ${NEWCHANGED}"
-            else
-                messageError "unable to change origin"
-            fi
-        else
-            messageError "${NEW} is not a valid repository"
-        fi
-    elif [[ "${CURRENT}" =~ "${FILTERBYSSH}" ]]; then
-        STR_ARRAY=(`echo $CURRENT | tr ':'  "\n"`)
-        NEW="https://github.com/${STR_ARRAY[1]}"
-        if [[ "${NEW}" =~ "https://github.com/".*".git" ]] ; then
-            gitSetCurrentOrigin $NEW
-            NEWCHANGED=$(gitGetCurrentOrigin)
-            if [[ "${NEW}" =~ ${NEWCHANGED} ]] ; then
-                messageSuccess "Origin changed to ${NEWCHANGED}"
-            else
-                messageError "unable to change origin"
-            fi
-        else
-            messageError "${NEW} is not a valid repository"
-        fi
-    else
-        message "Origin OK"
-    fi
-}
-
-function listAllModifiedFiles {
-    MODIFIED=`git status --porcelain`
-    if [ -n "$MODIFIED" ]; then
-        messageHighlight "\nModified files found in ${1}"
-        message $MODIFIED
-    fi
-}
-
-function createBranches {
-    CURRENT=$(gitGetCurrentOrigin)
-    git checkout master
-    gitFetchAll
-    branches=${@:1};
-    for branch in $branches
-    do
-        BRANCHLOCAL=$(git branch | grep "${branch}" | tr -d '* ')
-        BRANCHORIGIN=$(git branch -r | grep -w 'origin/${branch}' | tr -d "  origin/")
-        if [[ "${BRANCHLOCAL}" != "" && "${BRANCHORIGIN}" != '${branch}' ]]; then
-             message "Creating branch ${branch} origin/${branch}"
-             $(git checkout -b ${branch} origin/${branch})
-        fi
-    done
-}
