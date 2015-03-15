@@ -32,14 +32,14 @@ Scan all directories {dir} for git repositories and perform actions based on opt
 Syntax: `$ gitscan [options] {dir1} [{dir2} {dir3}...]`
 
 Options:
-- `-o`  update remote origin URLs format from oauth/ssh to https
+- `-o`  update remote origins URL from oauth/ssh format to https
 - `-m`  list all modified files
 - `-c`  create test and development branches in sync with origin
 
 ###buildenv
-Changes {build number} for a {branch} on site environmnet {env}
+Changes {build number} for a {branch} on site environment {env}
 
-**Warning:** Before using script, change line 4 'https/link/to/encriched.git' in file ~/.bashscripts/config/user.sh - swap dummy string with https link to enriched github repository
+**Warning:** Before using script, change line 4 'https/link/to/encriched.git' in file ~/.bashscripts/config/user.sh - swap dummy string with enriched repository URL
 
 Syntax: `$ buildenv {env} {branch} {build number}`
 
