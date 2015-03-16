@@ -29,10 +29,20 @@ elif [[ $1 && "$optP" = true && $2 ]]; then
 fi
 message "Merging ${gConf[colH]}${currentBranch}${gConf[colN]} with ${gConf[colH]}${mergeBranch}${gConf[colN]}"
 
-gitCheckoutBranchWithOrigin $mergeBranch
-currentBranch=$(gitGetCurrentBranch)
-if [[ "${currentBranch}" != "${mergeBranch}" ]]; then
-    messageExit
+#gitCheckoutBranchWithOrigin $mergeBranch
+#currentBranch=$(gitGetCurrentBranch)
+#if [[ "${currentBranch}" != "${mergeBranch}" ]]; then
+#    messageExit
+#fi
+CHECKOUT=$((git checkout $mergeBranch) 2>&1)
+if [[ "${CHECKOUT}" =~ "error: pathspec" ]]; then
+    echo -e "No such branch ${mergeBranch}. Creating..."
+    git checkout -b $mergeBranch origin/$mergeBranch
+    CURRENT=$((git rev-parse --abbrev-ref HEAD) 2>&1)
+    if [[ "${CURRENT}" != "${mergeBranch}" ]]; then
+        echo -e "Error: could not switch to ${mergeBranch}. ABORTING"
+        exit 1
+    fi
 fi
 
 git pull origin $mergeBranch
