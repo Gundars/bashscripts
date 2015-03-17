@@ -38,7 +38,7 @@ if ! [[ $buildNo =~ $buildNoRegex ]]; then
 	message "{build number} syntax: integer 1-5 digits long"
 fi
 
-if [[ uConf[enrichedRepository] =~ "https/link/to/encriched.git" ]]; then
+if [[ ${uConf[enrichedRepository]} =~ "https/link/to/encriched.git" ]]; then
 	messageError "Bad repository name"
 	message "Please change line 4 'https/link/to/encriched.git' in file ~/.bashscripts/config/user.sh to valid link to enriched github repository"
 fi
