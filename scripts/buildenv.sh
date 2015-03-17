@@ -59,8 +59,11 @@ sed -i "s/^${env}.*/${env} = ${buildNo}/g" $FILE
 git add $FILE
 git commit -m "${env} to ${buildNo}"
 git push origin master
+gDel=$(gitDiffDeleted)
+gAdd=$(gitDiffAdded)
+message "\n${gConf[colE]} ${gDel} ${gConf[colN]}"
+message "${gConf[colS]} ${gAdd} ${gConf[colN]}"
+
 cd ${gConf[dirStart]}
-message "\n${gConf[colE]} ${gitDiffDeleted} ${gConf[colN]}"
-message "${gConf[colS]} ${gitDiffAdded} ${gConf[colN]}"
 
 messageExit
