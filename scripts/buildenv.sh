@@ -46,7 +46,7 @@ fi
 exitIfErrors
 
 if ! [ -d ${gConf[dirTmp]} ]; then
-    git clone uConf[enrichedRepository] gConf[dirTmp]
+    git clone ${uConf[enrichedRepository]} ${gConf[dirTmp]}
 fi
 cd ${gConf[dirTmp]}
 git pull origin master
