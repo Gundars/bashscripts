@@ -115,11 +115,11 @@ function gitOriginAnyToHttps {
 }
 
 function gitDiffDeleted {
-    git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/'
+    git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[31m-(.*)\e\[m$/'
 }
 
 function gitDiffAdded {
-    git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[31m-(.*)\e\[m$/'
+    git diff HEAD^ HEAD --color=always|perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/'
 }
 
 function gitCheckoutBranchWithOrigin {
