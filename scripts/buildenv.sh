@@ -45,10 +45,10 @@ fi
 
 exitIfErrors
 
-if ! [ -d gConf[dirTmp] ]; then
+if ! [ -d ${gConf[dirTmp]} ]; then
     git clone uConf[enrichedRepository] gConf[dirTmp]
 fi
-cd gConf[dirTmp]
+cd ${gConf[dirTmp]}
 git pull origin master
 FILE=environment_definition/${branch}1/environment_definition.def
 if ! [ -f $FILE ]; then
@@ -59,7 +59,7 @@ sed -i "s/^${env}.*/${env} = ${buildNo}/g" $FILE
 git add $FILE
 git commit -m "${env} to ${buildNo}"
 git push origin master
-cd gConf[dirStart]
+cd ${gConf[dirStart]}
 message "\n${gConf[colE]} ${gitDiffDeleted} ${gConf[colN]}"
 message "${gConf[colS]} ${gitDiffAdded} ${gConf[colN]}"
 
