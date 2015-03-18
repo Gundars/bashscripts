@@ -1,5 +1,5 @@
 #!/bin/bash 
-# Merges current branch with {branch}, pushes changes to origin
+# Merges current branch into {branch}, pushes changes to origin
 # If no {branch} is specified, "development" is used
 # Syntax: $ gitmerge [options] [branch]
 source ~/.bashscripts/lib/commons.sh
@@ -27,7 +27,7 @@ if [[ $1 && "$optP" = false ]]; then
 elif [[ $1 && "$optP" = true && $2 ]]; then 
     mergeBranch=$2
 fi
-message "Merging ${gConf[colH]}${currentBranch}${gConf[colN]} with ${gConf[colH]}${mergeBranch}${gConf[colN]}"
+message "Merging ${gConf[colH]}${currentBranch}${gConf[colN]} into ${gConf[colH]}${mergeBranch}${gConf[colN]}"
 
 #gitCheckoutBranchWithOrigin $mergeBranch
 #currentBranch=$(gitGetCurrentBranch)
