@@ -17,11 +17,12 @@ directories="${@:2}";
 
 for dir in $directories
 do
-    if [ -d "$dir" ]; then
-        cd $dir>/dev/null;
+    realDir=$(getDirOrSymlinkToDir $dir)
+    if [[ $realDir != 1 ]]; then
+        cd $realDir>/dev/null;
         message "\nScanning ${PWD}"
         cd ->/dev/null
-        for d in `findAllGitDrectories $dir`; do
+        for d in `findAllGitDrectories $realDir`; do
             cd $d/.. > /dev/null
             pwd=$(pwd)
             messageHighlight "\nRepo: ${pwd}"

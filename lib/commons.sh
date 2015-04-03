@@ -7,8 +7,8 @@ function message {
 	if [ -z "$1" ]; then
 		echo "message param 1 error"
 	else
-	   echo -e "$1"       
-	fi	
+	   echo -e "$1"
+	fi
 }
 
 function messageSuccess {
@@ -16,7 +16,7 @@ function messageSuccess {
 		echo "messageSuccess param 1 error"
 	else
 	   echo -e "${gConf[colS]}$1${gConf[colN]}"
-	fi	
+	fi
 }
 
 function messageHighlight {
@@ -24,7 +24,7 @@ function messageHighlight {
 		echo "messageHightlight param 1 error"
 	else
 	   echo -e "${gConf[colH]}$1${gConf[colN]}"
-	fi	
+	fi
 }
 
 function messageError {
@@ -69,6 +69,16 @@ function removeOptionsFromArguments {
             argumentsWithoutOptions+=($arg)
         fi
     done
+}
+
+function getDirOrSymlinkToDir {
+    if [[ -L "$1" && -d "$1" ]]; then
+        echo $(readlink -f "$1")
+    elif [ -d "$1" ]; then
+	echo $1
+    else
+	echo 1
+    fi
 }
 
 function gitGetCurrentOrigin {
@@ -142,7 +152,6 @@ function gitCheckoutBranchWithOrigin {
     	    messageError "Failed to check out ${branchToCheckout}"
     	fi
     fi
-    
 }
 
 function gitLastCommit {

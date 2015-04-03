@@ -78,10 +78,11 @@ fi
 
 for dir in "${argumentsWithoutOptions[@]}"
 do
-    if [ -d "$dir" ]; then    
-        cd $dir>/dev/null;
+    realDir=$(getDirOrSymlinkToDir $dir)
+    if [[ $realDir != 1 ]]; then
+        cd $realDir>/dev/null;
         cd ->/dev/null
-        for d in `findAllGitDrectories $dir`; do
+        for d in `findAllGitDrectories $realDir`; do
             cd $d/.. > /dev/null
             pwd=$(pwd)
             messageHighlight "\nScanning ${PWD}"
