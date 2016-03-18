@@ -1,4 +1,5 @@
 #!/bin/bash
+# prerequisite: sudo apt-get install jq
 # generate your Github Token @ https://github.com/settings/tokens/new  with "repo" access
 apiToken=77885...........
 apiRoot=https://api.github.com
