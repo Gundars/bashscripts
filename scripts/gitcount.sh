@@ -1,4 +1,3 @@
-
 #!/bin/bash
 # generate your Github Token @ https://github.com/settings/tokens/new  with "repo" access
 apiToken=77885...........
