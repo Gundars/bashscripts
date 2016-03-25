@@ -6,7 +6,7 @@ Bash Scripts
 Execute the following line in bash shell:
 
 Install for the first time: 
-`git clone https://github.com/Gundars/bashscripts.git ~/.bashscripts && bash ~/.bashscripts/install.sh`
+`git clone git@github.com:Gundars/bashscripts.git ~/.bashscripts && bash ~/.bashscripts/install.sh`
 
 Update existing scripts: 
 `updatebashscripts`
