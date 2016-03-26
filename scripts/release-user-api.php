@@ -7,12 +7,23 @@ namespace Releaser;
  *
  * todo: options: master cut, patch master, patch patch
  *
+ * todo:
+ * if any dependency is released,
+ * then all dependencies depending on that also must be released,
+ * and then dependencies depending on those as well
+ *
+ * todo:
+ * if there are separate main repo 2 dependencies
+ * each also depending on each other, and only 1 requiring a release -
+ * validate the other one gets released too
+ *
+ * todo: validate it works if dependency has not current release
  * @package Releaser
  */
 class Releaser
 {
     /**
-     * get token https://github.com/settings/tokens/new  with "repo" access
+     * get token https://github.com/settings/tokens/new with "repo" access
      */
     const GITHUB_TOKEN = '';
 
@@ -31,6 +42,11 @@ class Releaser
     private $toBeReleased;
     private $currentRepo;
 
+    /**
+     * Releaser constructor.
+     * @param string $main
+     * @param array $dependencies
+     */
     public function __construct($main, array $dependencies)
     {
         $this->mainRepo = $main;
@@ -40,6 +56,9 @@ class Releaser
         $this->release();
     }
 
+    /**
+     *
+     */
     private function verifyAllStatuses()
     {
         foreach ($this->repos as $dep) {
@@ -47,6 +66,9 @@ class Releaser
         }
     }
 
+    /**
+     * @param $repo
+     */
     private function verifyStatus($repo)
     {
         $this->currentRepo = $repo;
@@ -55,6 +77,9 @@ class Releaser
         $this->branchNeedsANewRelease('master', $this->repos[$this->currentRepo]['current_master']);
     }
 
+    /**
+     *
+     */
     private function release()
     {
         $count = count($this->toBeReleased);
@@ -64,19 +89,41 @@ class Releaser
         }
 
         $this->msg("New $this->mainRepo {$this->repos[$this->mainRepo]['next_master']} to be released");
-        $this->msg("with $count repos:");
+        $this->msg("depending on $count new:");
         foreach ($this->toBeReleased as $repo) {
             $this->msg($this->repos[$repo]['current_master'] . ' ' . $repo);
         }
 
         $this->promptUserWhetherToProceed();
 
+        foreach ($this->toBeReleased as $repo) {
+            $this->currentRepo = $repo;
+            $this->createDotXBranch();
+        }
 
-        // todo:  the release !
+        //Release main repo
 
 
     }
 
+    private function createDotXBranch()
+    {
+        $ref = $this->getSourceRefHead();
+        if (isset($ref->object->sha)) {
+            $sha = $ref->object->sha;
+        } else {
+            var_dump($ref);
+            $this->err("Failed to obtain stable branch last commit sha hash");
+        }
+
+        $this->createDotXRef($sha);
+        $this->releaseDotXBranch();
+
+    }
+
+    /**
+     *
+     */
     private function promptUserWhetherToProceed()
     {
         $this->msg("\n");
@@ -92,6 +139,9 @@ class Releaser
         $this->msg("\nContinuing with release, press  Ctrl+C  to abort manually");
     }
 
+    /**
+     * @param $releases
+     */
     private function getLatestVersions($releases)
     {
         $tagsThreeLevels = [];
@@ -119,9 +169,9 @@ class Releaser
 
         $this->repos[$this->currentRepo] = [
             'current_master' => "$masterVMaxLevel1.$masterVMaxLevel2.$masterVMaxLevel3",
-            'next_master' => "$masterVMaxLevel1." . ($masterVMaxLevel2 + 1) . ".$masterVMaxLevel3",
-            'current_patch' => ($patchVMaxLevel3 > 0 ? "$masterVMaxLevel1.$masterVMaxLevel2.$patchVMaxLevel3" : null),
-            'next_patch' => ($patchVMaxLevel3 > 0 ? "$masterVMaxLevel1.$masterVMaxLevel2." . ($patchVMaxLevel3 + 1) : null),
+            'next_master'    => "$masterVMaxLevel1." . ($masterVMaxLevel2 + 1) . ".$masterVMaxLevel3",
+            'current_patch'  => ($patchVMaxLevel3 > 0 ? "$masterVMaxLevel1.$masterVMaxLevel2.$patchVMaxLevel3" : null),
+            'next_branch'    => "$masterVMaxLevel1." . ($masterVMaxLevel2 + 1) . ".x",
         ];
 
         $this->msg(
@@ -131,6 +181,10 @@ class Releaser
         );
     }
 
+    /**
+     * @param $branch
+     * @param $releaseVersion
+     */
     private function branchNeedsANewRelease($branch, $releaseVersion)
     {
         $comparison = $this->curlMasterReleaseAndMasterComparison($branch, $releaseVersion);
@@ -144,6 +198,58 @@ class Releaser
         }
     }
 
+    /**
+     * @return mixed
+     */
+    private function createDotXRef($sha)
+    {
+        $path = 'repos/' . static::GITHUB_OWNER . '/' . $this->currentRepo . '/git/refs';
+        $newRef = $this->repos[$this->currentRepo]['next_branch'];
+        $postData = [
+            'ref' => 'refs/heads/' . $newRef,
+            'sha' => $sha
+        ];
+        $result = $this->executeCurlRequest($path, $postData);
+
+        if (isset($result->ref) && $result->ref === $postData['ref']) {
+            $this->msg("Branch $newRef created for $this->currentRepo");
+
+            return true;
+        }
+
+        var_dump($result);
+        $this->err("Failed to create new ref. Aborting");
+    }
+
+    private function releaseDotXBranch()
+    {
+        $path = 'repos/' . static::GITHUB_OWNER . '/' . $this->currentRepo . '/releases';
+        $newTag = $this->repos[$this->currentRepo]['next_master'];
+        $releaseData = [
+            'tag_name'         => $newTag,
+            'target_commitish' => $this->repos[$this->currentRepo]['next_branch'],
+            'name'             => $newTag,
+            'body'             => 'Created by robots ' . date("D M d, Y G:i a"),
+            'draft'            => false,
+            'prerelease'       => false
+        ];
+
+        $result = $this->executeCurlRequest($path, $releaseData);
+        if (isset($result->tag_name) && $result->tag_name === $releaseData['tag_name']) {
+            $this->msg("Released $newTag $this->currentRepo");
+
+            return true;
+        }
+
+        var_dump($result);
+        $this->err("Failed to release $this->currentRepo. Aborting");
+    }
+
+    /**
+     * @param $branch
+     * @param $releaseVersion
+     * @return mixed
+     */
     private function curlMasterReleaseAndMasterComparison($branch, $releaseVersion)
     {
         $path = 'repos/'
@@ -155,43 +261,72 @@ class Releaser
             . '...'
             . $branch;
 
-        return @json_decode($this->executeCurlRequest($path));
+        return $this->executeCurlRequest($path);
     }
 
+    /**
+     * @return mixed
+     */
     private function curlGetReleases()
     {
         $path = 'repos/' . static::GITHUB_OWNER . '/' . $this->currentRepo . '/releases';
-
-        $releases = @json_decode($this->executeCurlRequest($path));
-        if (isset($releases->message)) {
-            $t = (static::GITHUB_TOKEN == '') ? ' const GITHUB_TOKEN is empty!' : '';
-            $this->err("{$releases->message}. $t ABORTING");
-        }
+        $releases = $this->executeCurlRequest($path);
 
         return $releases;
     }
 
-    private function executeCurlRequest($urlPath)
+    /**
+     * @return mixed
+     */
+    private function getSourceRefHead()
     {
-        $url = static::GITHUB_ROOT . $urlPath . '?access_token=' . static::GITHUB_TOKEN;
-        $ch = curl_init();
-        curl_setopt_array(
-            $ch,
-            [
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => 1,
-                CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'
-            ]
-        );
+        $path = 'repos/' . static::GITHUB_OWNER . '/' . $this->currentRepo . '/git/refs/heads/master';
+        $ref = $this->executeCurlRequest($path);
 
-        return curl_exec($ch);
+        return $ref;
     }
 
+
+    /**
+     * @param $urlPath
+     * @return mixed
+     */
+    private function executeCurlRequest($urlPath, $requestData = [])
+    {
+        $url = static::GITHUB_ROOT . $urlPath . '?access_token=' . static::GITHUB_TOKEN;
+        //var_dump($url);
+        $ch = curl_init();
+        $options = [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'
+        ];
+        if (!empty($requestData)) {
+            $options[CURLOPT_POSTFIELDS] = json_encode($requestData);
+        }
+        curl_setopt_array($ch, $options);
+
+        $result = @json_decode(curl_exec($ch));
+
+        if (isset($result->message)) {
+            $t = (static::GITHUB_TOKEN == '') ? ' const GITHUB_TOKEN is empty!' : '';
+            $this->err("{$result->message}. $t ABORTING");
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $message
+     */
     private function msg($message)
     {
         echo "$message \n";
     }
 
+    /**
+     * @param $message
+     */
     private function err($message)
     {
         echo "$message \n";
@@ -205,16 +340,16 @@ class Releaser
  * starting with most common libraries with no releasable dependencies on top
  */
 $userApiDependencies = [
-    'fusion-build-utilities',
-    'fusion-commons-core',
+//    'fusion-build-utilities',
+//    'fusion-commons-core',
     'fusion-lib-wireless-factory',
-    'fusion-lib-vouchers',
-    'fusion-session-management',
-    'fusion-authentication',
-    'fusion-authorisation',
-    'fusion-account-management',
-    'fusion-subscription',
-    'fusion-lib-payment',
+//    'fusion-lib-vouchers',
+//    'fusion-session-management',
+//    'fusion-authentication',
+//    'fusion-authorisation',
+//    'fusion-account-management',
+//    'fusion-subscription',
+//    'fusion-lib-payment',
 ];
 
 new Releaser('fusion-api-user', $userApiDependencies);
